@@ -8,13 +8,13 @@ A projekt egy belső nézetű (FPS) játék ahol egy procedurálisan generált l
 
 **Kamerakezelés:** (FPS)
 
-**Objektumok:** .obj fájlokból betöltött szobaelemek, falak és minotaurusz modell.
+**Objektumok:** .obj fájlbol betöltött minotaurusz modell.
 
-**Animáció:** Interaktív ajtónyitódás a szobák között.
+**Animáció:** Fáklya animáció és kard lebegés.
 
 **Textúrázás:** Minden modell saját textúrával rendelkezik (kőfalak, talaj, minotaurusz).
 
-**Világítás:** Dinamikus fényforrás (fáklya effektus), amelynek intenzitása a + és - gombokkal szabályozható.
+**Világítás:** Statikus fényforrás (fáklya effektus), amelynek intenzitása a + és - gombokkal szabályozható.
 
 **Súgó:** Az F1 billentyű megnyomásával előhívható kezelési útmutató.
 
