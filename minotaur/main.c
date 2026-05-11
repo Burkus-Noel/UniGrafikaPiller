@@ -42,7 +42,6 @@ int main(int argc, char* argv[]) {
     SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_OPENGL);
     SDL_GLContext glContext = SDL_GL_CreateContext(window);
 
-    // OpenGL alapbeállítások (csak a legszükségesebbek)
     glEnable(GL_DEPTH_TEST);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     
@@ -50,17 +49,16 @@ int main(int argc, char* argv[]) {
     initText();
     setupCameraProjection(45.0f, 800.0f/600.0f, 0.1f, 500.0f);
     
-    // Erőforrások betöltése
-    stoneTexture  = loadTexture("stone.png");
-    ajtoTexture   = loadTexture("ajto.jpg");
-    floorTexture  = loadTexture("floor.jpg");
-    fireTexture   = loadTexture("tuz.png");
-    torchTexture  = loadTexture("torch.jpg");
-    helmetTexture = loadTexture("visor3.png");
-    swordTexture  = loadTexture("sword.png");
+    stoneTexture  = loadTexture("assets/stone.png");
+    ajtoTexture   = loadTexture("assets/ajto.jpg");
+    floorTexture  = loadTexture("assets/floor.jpg");
+    fireTexture   = loadTexture("assets/tuz.png");
+    torchTexture  = loadTexture("assets/torch.jpg");
+    helmetTexture = loadTexture("assets/visor3.png");
+    swordTexture  = loadTexture("assets/sword.png");
     
-    loadOBJ("minotaur.obj", &minoModel);
-    minoModel.texture = loadTexture("minotaur.png");
+    loadOBJ("assets/minotaur.obj", &minoModel);
+    minoModel.texture = loadTexture("assets/minotaur.png");
 
     SDL_SetRelativeMouseMode(SDL_TRUE);
     initFirstRoom();

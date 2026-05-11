@@ -14,12 +14,12 @@ void initAudio() {
         printf("Hiba: %s\n", Mix_GetError());
     }
     
-    helmetSound = Mix_LoadWAV("helmetup.mp3");
-    doorSound = Mix_LoadWAV("door.mp3");
-    endingMusic = Mix_LoadWAV("ending.mp3");
-    winningMusic = Mix_LoadWAV("won.mp3");
-    backgroundMusic = Mix_LoadMUS("maze.mp3");
-    bossMusic = Mix_LoadMUS("bossbattle.mp3");
+    helmetSound = Mix_LoadWAV("assets/helmetup.mp3");
+    doorSound = Mix_LoadWAV("assets/door.mp3");
+    endingMusic = Mix_LoadWAV("assets/ending.mp3");
+    winningMusic = Mix_LoadWAV("assets/won.mp3");
+    backgroundMusic = Mix_LoadMUS("assets/maze.mp3");
+    bossMusic = Mix_LoadMUS("assets/bossbattle.mp3");
     Mix_PlayMusic(backgroundMusic, -1);
 }
 

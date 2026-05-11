@@ -30,7 +30,7 @@ Particle particles[MAX_PARTICLES];
 
 void initText() {
     if (TTF_Init() == -1) return;
-    font = TTF_OpenFont("font.ttf", 20);
+    font = TTF_OpenFont("assets/font.ttf", 20);
 }
 
 void setupCameraProjection(float fovy, float aspect, float zNear, float zFar) {
@@ -135,7 +135,7 @@ void drawFire(float x, float z, GLuint fireTex, GLuint torchTex) {
         glTexCoord2f(0, 3); glVertex3f(-0.05f,  0.6f, 0.0f);
     glEnd();
 
-    // 2. LÁNG (Animált & Transzparens)
+    // 2. LÁNG
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_ALPHA_TEST);
@@ -148,10 +148,10 @@ void drawFire(float x, float z, GLuint fireTex, GLuint torchTex) {
     float tMax = tMin + (1.0f / 6.0f);
 
     glBegin(GL_QUADS);
-        glTexCoord2f(tMin, 0.15f); glVertex3f(-0.3f, 0.5f, 0.01f);
-        glTexCoord2f(tMax, 0.15f); glVertex3f( 0.3f, 0.5f, 0.01f);
-        glTexCoord2f(tMax, 0.85f); glVertex3f( 0.3f, 1.1f, 0.01f);
-        glTexCoord2f(tMin, 0.85f); glVertex3f(-0.3f, 1.1f, 0.01f);
+        glTexCoord2f(tMax, 1.0f); glVertex3f( 0.3f, 0.5f, 0.01f);
+        glTexCoord2f(tMin, 1.0f); glVertex3f( 0.3f, 1.1f, 0.01f);
+        glTexCoord2f(tMin, 0.0f); glVertex3f(-0.3f, 1.1f, 0.01f);
+        glTexCoord2f(tMax, 0.0f); glVertex3f(-0.3f, 0.5f, 0.01f);
     glEnd();
 
     glDisable(GL_ALPHA_TEST);

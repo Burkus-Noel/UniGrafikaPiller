@@ -5,6 +5,11 @@
 #include <SDL2/SDL_ttf.h>
 #include <stdbool.h>
 
+//pi definíció
+#ifndef M_PI
+    #define M_PI 3.14159265358979323846
+#endif
+
 // Modell limitek
 #define MAX_VERTICES 500000
 #define MAX_FACES 1000000
