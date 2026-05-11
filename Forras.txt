@@ -1,0 +1,41 @@
+Mino model/texture:
+https://www.meshy.ai/
+
+Helmet:
+https://gemini.google.com
+
+Tűz:
+https://gemini.google.com
+
+Fal:
+https://www.magnific.com/free-photo/brick-wall-background-texture_32249534.htm#fromView=keyword&page=1&position=0&uuid=2f58ffb8-12c2-4e09-a19f-72a0a1e7248d&query=Medieval+stacked+stone+tiles
+
+Padló:
+https://www.magnific.com/free-photo/brick-wall-background-texture_34862137.htm#fromView=search&page=1&position=11&uuid=fd24ef09-8bfa-443a-8097-72ec70a00917&query=brick+wall+dungeon
+
+Torch handle:
+https://www.magnific.com/free-vector/grunge-wood-texture_2813632.htm#fromView=keyword&page=1&position=1&uuid=998c7cac-1103-4026-b6bc-3776cd8fadb2&query=Free+wood+texture+illustrator
+
+Door:
+https://www.magnific.com/free-photo/antique-wooden-doors-aged-timber-vintage-ironwork_418794038.htm#fromView=search&page=2&position=8&uuid=b5c7092d-3413-451a-a84e-3ae874a494b8&query=dungeon+door+texture
+
+Háttérzene:
+https://pixabay.com/sound-effects/horror-creature-in-the-sewer-17657/
+
+Bossfight zene:
+https://pixabay.com/sound-effects/film-special-effects-battle-warrior-fighting-drums-478210/
+
+Helmet up hang:
+https://pixabay.com/sound-effects/film-special-effects-metal-crunch-263638/
+
+Ajtó csukódás hang:
+https://pixabay.com/sound-effects/household-closing-metal-door-44280/
+
+Gameover hang:
+https://pixabay.com/sound-effects/musical-game-over-417465/
+
+Win hang:
+https://pixabay.com/sound-effects/musical-medieval-fanfare-6826/
+
+Kard textúra:
+https://gemini.google.com

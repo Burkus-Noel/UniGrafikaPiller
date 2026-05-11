@@ -4,12 +4,17 @@
 #include <SDL2/SDL.h>
 #include <stdbool.h>
 
-// Játékos adatok
+// Játékos pozíció és nézőpont
 extern float posX, posZ;
 extern float yaw, pitch;
 extern float eyeHeight; 
-extern bool showMenu; 
 
+// UI és felszerelés állapotok
+extern bool showMenu; 
+extern bool helmetOn;
+
+// Funkciók
 void handlePlayerMovement(const Uint8* state);
+void checkSwordPickup();
 
 #endif

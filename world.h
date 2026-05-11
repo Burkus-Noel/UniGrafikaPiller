@@ -12,13 +12,13 @@ typedef struct {
     int doorX, doorZ; 
 } Room;
 
-// Játéktér állapotai
+// Globális térkép adatok
 extern int roomsVisited;
 extern int map[MAX_MAP_SIZE][MAX_MAP_SIZE]; 
 extern int currentWidth;
 extern int currentHeight;
 
-// Függvények
+// Pályakezelés
 void initFirstRoom();
 void progressToNextLevel(); 
 void copyToMap(Room source);
