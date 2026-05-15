@@ -1,22 +1,15 @@
 #define _USE_MATH_DEFINES
 #include "graphics.h"
 #include "world.h"
+#include "draw.h"
+#include "UI.h"
 #include <SDL2/SDL_image.h>
 #include <math.h>
 #include <stdlib.h>
-
-TTF_Font* font = NULL;       
+    
 float brightness = 1.0f;
-
-extern float yaw;
-extern float posX, posZ;
 extern Room* currentRoomPtr;
 extern SimpleModel minoModel;
-extern int swordCount;
-
-float bossTextTimer = 0.0f;
-bool bossTextTriggered = false;
-const char* currentBossMessage = "";
 
 // --- PARTIKLUK ---
 #define MAX_PARTICLES 300
@@ -27,11 +20,6 @@ typedef struct {
 Particle particles[MAX_PARTICLES];
 
 // --- RENDSZER BEÁLLÍTÁSOK ---
-
-void initText() {
-    if (TTF_Init() == -1) return;
-    font = TTF_OpenFont("assets/font.ttf", 20);
-}
 
 void setupCameraProjection(float fovy, float aspect, float zNear, float zFar) {
     glMatrixMode(GL_PROJECTION);
@@ -71,133 +59,9 @@ void initLighting() {
     update_lighting();
 }
 
-// --- RAJZOLÁS ---
-
-void drawWall(float x, float z, float h) {
-    glPushMatrix();
-    glTranslatef(x, 0.0f, z);
-    glBegin(GL_QUADS);
-        glNormal3f(0, 0, 1);
-        glTexCoord2f(0, 0); glVertex3f(-1, -1, 1);
-        glTexCoord2f(1, 0); glVertex3f( 1, -1, 1);
-        glTexCoord2f(1, h/2); glVertex3f( 1, h, 1);
-        glTexCoord2f(0, h/2); glVertex3f(-1, h, 1);
-        
-        glNormal3f(0, 0, -1);
-        glTexCoord2f(0, 0); glVertex3f( 1, -1, -1);
-        glTexCoord2f(1, 0); glVertex3f(-1, -1, -1);
-        glTexCoord2f(1, h/2); glVertex3f(-1, h, -1);
-        glTexCoord2f(0, h/2); glVertex3f( 1, h, -1);
-
-        glNormal3f(-1, 0, 0);
-        glTexCoord2f(0, 0); glVertex3f(-1, -1, -1);
-        glTexCoord2f(1, 0); glVertex3f(-1, -1, 1);
-        glTexCoord2f(1, h/2); glVertex3f(-1, h, 1);
-        glTexCoord2f(0, h/2); glVertex3f(-1, h, -1);
-
-        glNormal3f(1, 0, 0);
-        glTexCoord2f(0, 0); glVertex3f( 1, -1, 1);
-        glTexCoord2f(1, 0); glVertex3f( 1, -1, -1);
-        glTexCoord2f(1, h/2); glVertex3f( 1, h, -1);
-        glTexCoord2f(0, h/2); glVertex3f( 1, h, 1);
-    glEnd();
-    glPopMatrix();
-}
-
-void drawDoor(float x, float z, float h, GLuint texture) {
-    glPushMatrix();
-    glTranslatef(x, 0.0f, z);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    
-    glBegin(GL_QUADS);
-        glNormal3f(0, 0, 1); // Az ajtó előlapja felénk néz
-        glTexCoord2f(0, 0);    glVertex3f(-1.0f, -1.2f, 0.11f); 
-        glTexCoord2f(1, 0);    glVertex3f( 1.0f, -1.2f, 0.11f); 
-        glTexCoord2f(1, 1.0f); glVertex3f( 1.0f,  h,     0.11f); 
-        glTexCoord2f(0, 1.0f); glVertex3f(-1.0f,  h,     0.11f); 
-    glEnd();
-    
-    glPopMatrix();
-}
-
-void drawFire(float x, float z, GLuint fireTex, GLuint torchTex) {
-    glPushMatrix();
-    glTranslatef(x, 0.0f, z);
-    glRotatef(-yaw, 0, 1, 0);
-    glEnable(GL_TEXTURE_2D);
-
-    // 1. FÁKLYA NYELE
-    glBindTexture(GL_TEXTURE_2D, torchTex);
-    glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f(-0.05f, -1.0f, 0.0f);
-        glTexCoord2f(1, 0); glVertex3f( 0.05f, -1.0f, 0.0f);
-        glTexCoord2f(1, 3); glVertex3f( 0.05f,  0.6f, 0.0f);
-        glTexCoord2f(0, 3); glVertex3f(-0.05f,  0.6f, 0.0f);
-    glEnd();
-
-    // 2. LÁNG
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_ALPHA_TEST);
-    glAlphaFunc(GL_GREATER, 0.1f);
-    
-    glBindTexture(GL_TEXTURE_2D, fireTex);
-
-    int frame = (SDL_GetTicks() / 100) % 6;
-    float tMin = frame * (1.0f / 6.0f);
-    float tMax = tMin + (1.0f / 6.0f);
-
-    glBegin(GL_QUADS);
-        glTexCoord2f(tMax, 1.0f); glVertex3f( 0.3f, 0.5f, 0.01f);
-        glTexCoord2f(tMin, 1.0f); glVertex3f( 0.3f, 1.1f, 0.01f);
-        glTexCoord2f(tMin, 0.0f); glVertex3f(-0.3f, 1.1f, 0.01f);
-        glTexCoord2f(tMax, 0.0f); glVertex3f(-0.3f, 0.5f, 0.01f);
-    glEnd();
-
-    glDisable(GL_ALPHA_TEST);
-    glDisable(GL_BLEND);
-    glEnable(GL_LIGHTING);
-    glPopMatrix();
-}
-
-void drawMinotaur(float x, float z, SimpleModel* model) {
-    glPushMatrix();
-        glTranslatef(x, 1.2f, z); 
-        float dx = posX - x;
-        float dz = posZ - z;
-        float angle = atan2f(dx, dz) * (180.0f / M_PI);
-        glRotatef(angle, 0, 1, 0); 
-        glScalef(2.0f, 2.0f, 2.0f); 
-        drawSimpleModel(model);
-    glPopMatrix();
-}
-
-void drawHelmetOverlay(GLuint texture) {
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-
-    glBegin(GL_QUADS);
-        glTexCoord2f(0.0f, 0.0f); 
-        glVertex2f(-50.0f, -200.0f);   
-        glTexCoord2f(1.0f, 0.0f); 
-        glVertex2f(850.0f, -200.0f); 
-        glTexCoord2f(1.0f, 1.0f); 
-        glVertex2f(850.0f, 600.0f);  
-
-        // Bal alsó
-        glTexCoord2f(0.0f, 1.0f); 
-        glVertex2f(-50.0f, 600.0f);   
-    glEnd();
-    
-    glDisable(GL_BLEND);
-}
-
 // --- FŐ RAJZOLÓK ---
 
-void drawMap() {
+void drawMap(GameState* state, Assets* assets) {
     glEnable(GL_LIGHTING);
     update_lighting();
 
@@ -206,7 +70,7 @@ void drawMap() {
             float wx = i * 2.0f;
             float wz = j * 2.0f;
 
-            glBindTexture(GL_TEXTURE_2D, floorTexture);
+            glBindTexture(GL_TEXTURE_2D, assets->floor);
             glBegin(GL_QUADS);
                 glNormal3f(0, 1, 0);
                 glTexCoord2f(0, 0); glVertex3f(wx - 1, -1.01f, wz - 1);
@@ -217,26 +81,28 @@ void drawMap() {
 
             int cell = map[j][i];
             if (cell == 1) {
-                glBindTexture(GL_TEXTURE_2D, stoneTexture);
+                glBindTexture(GL_TEXTURE_2D, assets->stone);
                 drawWall(wx, wz, 60.0f);
             } else if (cell == 2) {
-                drawFire(wx, wz, fireTexture, torchTexture);
+                drawFire(wx, wz, assets->fire, assets->torch);
             } else if (cell == 3 || cell == 4) {
                 glPushMatrix();
                 glTranslatef(wx, 0, wz);
                 if (i == 0 || i == currentWidth - 1) glRotatef(90, 0, 1, 0);
-                drawDoor(0, 0, 3.5f, ajtoTexture);
+                drawDoor(0, 0, 3.5f, assets->ajto);
                 glTranslatef(0, 3.5f, 0); 
-                glBindTexture(GL_TEXTURE_2D, stoneTexture);
+                glBindTexture(GL_TEXTURE_2D, assets->stone);
                 drawWall(0, 0, 25.0f);
                 glPopMatrix();
             }
-            else if (cell == 5 && !minoSpawned) { 
-                minoX = wx; minoZ = wz; minoSpawned = true; 
+            else if (cell == 5 && !state->minoSpawned) { 
+                state->minoX = wx; 
+                state->minoZ = wz; 
+                state->minoSpawned = true; 
             }
             else if (cell == 6) {
             glEnable(GL_TEXTURE_2D);
-            glBindTexture(GL_TEXTURE_2D, swordTexture);
+            glBindTexture(GL_TEXTURE_2D, assets->sword);
             glEnable(GL_ALPHA_TEST);
             float wx = i * 2.0f;
                 float wz = j * 2.0f;
@@ -256,159 +122,6 @@ void drawMap() {
             }
         }
     }
-}
-
-void renderText(const char* text, int x, int y, SDL_Color color) {
-    if (!font || !text) return;
-    SDL_Surface* surf = TTF_RenderUTF8_Solid(font, text, color);
-    if (!surf) return;
-    SDL_Surface* rgbaSurf = SDL_ConvertSurfaceFormat(surf, SDL_PIXELFORMAT_RGBA32, 0);
-    SDL_FreeSurface(surf);
-    if (!rgbaSurf) return;
-
-    GLuint tex;
-    glGenTextures(1, &tex);
-    glBindTexture(GL_TEXTURE_2D, tex);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, rgbaSurf->w, rgbaSurf->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, rgbaSurf->pixels);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glColor4ub(color.r, color.g, color.b, color.a); 
-
-    glBegin(GL_QUADS);
-        glTexCoord2f(0,0); glVertex2f(x, y);
-        glTexCoord2f(1,0); glVertex2f(x + rgbaSurf->w, y);
-        glTexCoord2f(1,1); glVertex2f(x + rgbaSurf->w, y + rgbaSurf->h);
-        glTexCoord2f(0,1); glVertex2f(x, y + rgbaSurf->h);
-    glEnd();
-
-    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-    glDisable(GL_BLEND);
-    glDeleteTextures(1, &tex);
-    SDL_FreeSurface(rgbaSurf);
-}
-
-void triggerBossMessage(const char* message, float duration) {
-    if (!bossTextTriggered) {
-        currentBossMessage = message;
-        bossTextTimer = duration;
-        bossTextTriggered = true;
-    }
-}
-
-void drawUI(bool showMenu, bool gameOver, bool helmetOn, bool gameWon) {
-    glDisable(GL_FOG);
-    glDisable(GL_LIGHTING);
-    glDisable(GL_DEPTH_TEST);
-
-    glMatrixMode(GL_PROJECTION);
-    glPushMatrix();
-    glLoadIdentity();
-    glOrtho(0, 800, 600, 0, -1, 1);
-    
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    glLoadIdentity();
-
-    SDL_Color white = {255, 255, 255, 255}, yellow = {255, 255, 0, 255}, green = {0, 255, 0, 255}, red = {255, 0, 0, 255};
-    
-    if (helmetOn && !gameOver && !showMenu) {
-        drawHelmetOverlay(helmetTexture);
-    }
-
-    if (!gameOver && !gameWon) {
-        renderText("Controls: F1", 50, 550, green);
-    }
-
-    if (showMenu) {
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glDisable(GL_TEXTURE_2D); 
-        glColor4f(0.0f, 0.0f, 0.0f, 0.85f); 
-        glBegin(GL_QUADS);
-            glVertex2f(50, 50); glVertex2f(750, 50);
-            glVertex2f(750, 550); glVertex2f(50, 550);
-        glEnd();
-        
-        glEnable(GL_TEXTURE_2D);
-        renderText("--- CONTROLS ---", 280, 80, yellow);
-        renderText("W/S/A/D - Movement", 100, 160, white);
-        renderText("SHIFT   - Run", 100, 200, white);
-        renderText("C       - Crouch", 100, 240, white);
-        renderText("+ / -   - Brightness", 100, 280, white);
-        renderText("V       - Visor", 100, 320, white);
-        renderText("F1      - Resume", 320, 510, yellow);
-    }
-
-    if (!gameOver && !showMenu && bossTextTimer > 0) {
-        glDisable(GL_TEXTURE_2D);
-        
-        glColor4f(0.1f, 0.1f, 0.1f, 0.1f); 
-        
-        glBegin(GL_QUADS);
-            glVertex2f(100, 400); glVertex2f(700, 400);
-            glVertex2f(700, 500); glVertex2f(100, 500);
-        glEnd();
-        
-        glEnable(GL_TEXTURE_2D);
-        SDL_Color red = {255, 0, 0, 255}; 
-        renderText(currentBossMessage, 150, 430, red);
-    }
-
-    if (!gameOver && !showMenu) {
-        char swordText[64];
-        SDL_Color textColor;
-
-        if (swordCount < 10) {
-            sprintf(swordText, "SWORDS: %d / 10", swordCount);
-            textColor.r = 255; textColor.g = 255; textColor.b = 255; textColor.a = 255;
-        } else {
-            sprintf(swordText, "SWORD REFORGED");
-            float pulse = 0.75f + 0.25f * sinf(SDL_GetTicks() * 0.005f);
-            
-            textColor.r = 0; 
-            textColor.g = (Uint8)(255.0f * pulse); 
-            textColor.b = (Uint8)(255.0f * pulse);
-            textColor.a = 255;
-        }
-        renderText(swordText, 50, 520, textColor);
-    }
-
-    if (gameOver) {
-        glDisable(GL_TEXTURE_2D);
-        glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
-        glBegin(GL_QUADS);
-            glVertex2f(0, 0); glVertex2f(800, 0);
-            glVertex2f(800, 600); glVertex2f(0, 600);
-        glEnd();
-        glEnable(GL_TEXTURE_2D);
-        glColor4f(1.0f, 1.0f, 1.0f, 1.0f); 
-        
-        renderText("GAME OVER", 330, 280, red);
-        renderText("Next time try to bring a sword to a bull fight.", 220, 330, white);
-    }
-    if (gameWon) {
-        glDisable(GL_TEXTURE_2D);
-        glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
-        glBegin(GL_QUADS);
-            glVertex2f(0, 0); glVertex2f(800, 0);
-            glVertex2f(800, 600); glVertex2f(0, 600);
-        glEnd();
-        glEnable(GL_TEXTURE_2D);
-        glColor4f(1.0f, 1.0f, 1.0f, 1.0f); 
-        
-        renderText("YOU'RE WINNER!", 330, 280, green);
-        renderText("Congratulations on defeating the Minotaur!", 220, 330, white);
-    }
-
-    glMatrixMode(GL_PROJECTION); glPopMatrix();
-    glMatrixMode(GL_MODELVIEW); glPopMatrix();
-    
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_LIGHTING);
-    glEnable(GL_FOG);
 }
 
 // --- PARTICLE ---

@@ -19,7 +19,6 @@ void copyToMap(Room source) {
     currentWidth = source.width;
     currentHeight = source.height;
 
-    // Térkép törlése és feltöltése
     memset(map, 0, sizeof(map));
     for (int j = 0; j < currentHeight; j++) {
         for (int i = 0; i < currentWidth; i++) {

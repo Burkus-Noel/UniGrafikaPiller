@@ -13,7 +13,7 @@ extern float eyeHeight;
 extern bool showMenu; 
 extern bool helmetOn;
 
-// Funkciók
+// Mozgás kezelés, és kard felvételének ellenőrzése
 void handlePlayerMovement(const Uint8* state);
 void checkSwordPickup();
 

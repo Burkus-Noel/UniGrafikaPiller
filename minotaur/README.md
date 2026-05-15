@@ -31,4 +31,6 @@ A projekt egy belső nézetű (FPS) játék ahol egy procedurálisan generált l
 
 ## FUTTATÁS:
 
-A minotaur modelt ki kell csomagolni, majd make fileal lefordul a kód, aztán egy p.exe fog elő állni amit már lehet is futtatni.
+Az alábbi linken elérhetőek az assettek: https://drive.google.com/drive/folders/1x6fQ6rOnanDUzLcu8bjjYmnIJxhpQRIa?usp=sharing
+ez az egész mappát be kell tölteni a p.exe mellé egy "assets" nevű mappába
+

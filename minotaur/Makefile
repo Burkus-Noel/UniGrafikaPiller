@@ -9,7 +9,7 @@ endif
 
 CC = gcc
 CFLAGS = -Wall -std=c11
-SRC = main.c world.c graphics.c player.c map_data.c sound.c
+SRC = main.c world.c graphics.c player.c map_data.c sound.c draw.c UI.c engine.c
 
 all: $(EXE)
 

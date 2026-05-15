@@ -9,7 +9,6 @@
 bool showMenu = false;
 bool helmetOn = false;
 bool f1Pressed = false;
-extern int swordCount;
 
 float posX = 0.0f, posZ = 0.0f;
 float yaw = 0.0f, pitch = 0.0f;
@@ -20,14 +19,14 @@ extern int map[MAX_MAP_SIZE][MAX_MAP_SIZE];
 extern int currentWidth, currentHeight;
 extern float brightness;
 
-void checkSwordPickup() {
+void checkSwordPickup(GameState* state) {
     int gridX = (int)((posX + 1.0f) / 2.0f);
     int gridZ = (int)((posZ + 1.0f) / 2.0f);
 
     if (gridX >= 0 && gridX < currentWidth && gridZ >= 0 && gridZ < currentHeight) {
         if (map[gridZ][gridX] == 6) {
             map[gridZ][gridX] = 0;
-            swordCount++;
+            state->swordCount++;
         }
     }
 }
@@ -40,14 +39,13 @@ int isWall(float x, float z) {
     if (i < 0 || i >= currentWidth || j < 0 || j >= currentHeight) return 1;
 
     int cell = map[j][i];
-    return (cell == 1 || cell == 4); // Fal vagy szilárd akadály
+    return (cell == 1 || cell == 4);
 }
 
 void handlePlayerMovement(const Uint8* state) {
-    // Menü kezelése (Toggle)
     if (state[SDL_SCANCODE_F1]) {
         if (!f1Pressed) {
-            showMenu = !showMenu;
+            game.showMenu = !game.showMenu;
             f1Pressed = true;
         }
     } else {
@@ -64,7 +62,7 @@ void handlePlayerMovement(const Uint8* state) {
 
     uint32_t currentTime = SDL_GetTicks();
     if (state[SDL_SCANCODE_V] && currentTime > lastVPress + 300) {
-        helmetOn = !helmetOn;
+        game.helmetOn = !game.helmetOn;
         playHelmetSound();
         lastVPress = currentTime;
     }
