@@ -3,12 +3,16 @@
 
 #include <stdbool.h>
 #include <math.h>
+#include "player.h"
 #include <stdlib.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
 #include <SDL2/SDL_image.h>
 
 #define MAX_MAP_SIZE 20
+
+typedef struct Player Player;
+
 
 // Modell betöltéshez szükséges kódok
 #define MAX_VERTICES 500000
@@ -35,7 +39,7 @@ typedef struct {
 } Room;
 
 // Játék állapot
-typedef struct {
+typedef struct GameState {
     bool running;
     bool gameOver;
     bool gameWon;
@@ -60,18 +64,19 @@ typedef struct {
 } Assets;
 
 
-extern GameState game;
-extern Assets assets;
+typedef struct MapData {
+    int roomsVisited;
+    int map[MAX_MAP_SIZE][MAX_MAP_SIZE];
+    int currentWidth;
+    int currentHeight;
+    Room currentRoom;
+    Room* currentRoomPtr;
+} MapData;
 
-// Globális térkép adatok
-extern int roomsVisited;
-extern int map[MAX_MAP_SIZE][MAX_MAP_SIZE]; 
-extern int currentWidth;
-extern int currentHeight;
 
 // Pályakezelés
-void initFirstRoom();
-void progressToNextLevel(); 
-void copyToMap(Room source);
+void initFirstRoom(Player* player,MapData* mapData);
+void progressToNextLevel(Player* player,MapData* mapData); 
+void copyToMap(Room source, Player* player, MapData* mapData);
 
 #endif

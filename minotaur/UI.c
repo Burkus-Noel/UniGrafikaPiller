@@ -7,7 +7,6 @@
 #include <stdlib.h>
 
 TTF_Font* font = NULL; 
-extern int swordCount;
 
 void initText() {
     if (TTF_Init() == -1) return;

@@ -1,9 +1,9 @@
 
 ifeq ($(OS),Windows_NT)
-    EXE = p.exe
+    EXE = mino.exe
     LDFLAGS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer -lopengl32
 else
-    EXE = p
+    EXE = mino
     LDFLAGS = -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer -lGL -lGLU -lm
 endif
 

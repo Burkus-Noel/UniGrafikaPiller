@@ -5,28 +5,25 @@
 #include <SDL2/SDL_ttf.h>
 #include <stdbool.h>
 #include "world.h"
+#include "player.h"
 
-//pi definíció
+
 #ifndef M_PI
     #define M_PI 3.14159265358979323846
 #endif
 
-// --- Rendszer inicializálás ---
 void setupCameraProjection(float fovy, float aspect, float zNear, float zFar);
 void initLighting();
 void setupFog();
 void update_lighting();
 
-// --- Részecskerendszer ---
-void initParticlesEverywhere();
+void initParticlesEverywhere(MapData* mapData);
 void updateAndDrawParticles();
 
-// --- 3D Megjelenítés ---
-void drawMap(GameState* state, Assets* assets);
+void drawMap(GameState* state, Assets* assets, Player* player, MapData* mapData);;
 void loadOBJ(const char* filename, SimpleModel* model);
 void drawSimpleModel(SimpleModel* model);
 
-// --- Segédfüggvények ---
 GLuint loadTexture(const char* filename);
 
 #endif

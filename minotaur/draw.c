@@ -1,13 +1,11 @@
 #define _USE_MATH_DEFINES
 #include "graphics.h"
 #include "world.h"
+#include "player.h"
 #include <SDL2/SDL_image.h>
 #include <math.h>
 #include <stdlib.h>
 
-
-extern float yaw;
-extern float posX, posZ;
 
 void drawWall(float x, float z, float h) {
     glPushMatrix();
@@ -56,10 +54,10 @@ void drawDoor(float x, float z, float h, GLuint texture) {
     glPopMatrix();
 }
 
-void drawFire(float x, float z, GLuint fireTex, GLuint torchTex) {
+void drawFire(float x, float z, GLuint fireTex, GLuint torchTex, Player* player) {
     glPushMatrix();
     glTranslatef(x, 0.0f, z);
-    glRotatef(-yaw, 0, 1, 0);
+    glRotatef(-player->yaw, 0, 1, 0);
     glEnable(GL_TEXTURE_2D);
 
     // 1. FÁKLYA NYELE
@@ -96,11 +94,11 @@ void drawFire(float x, float z, GLuint fireTex, GLuint torchTex) {
     glPopMatrix();
 }
 
-void drawMinotaur(float x, float z, SimpleModel* model) {
+void drawMinotaur(float x, float z, SimpleModel* model, Player* player) {
     glPushMatrix();
         glTranslatef(x, 1.2f, z); 
-        float dx = posX - x;
-        float dz = posZ - z;
+        float dx = player->posX - x;
+        float dz = player->posZ - z;
         float angle = atan2f(dx, dz) * (180.0f / M_PI);
         glRotatef(angle, 0, 1, 0); 
         glScalef(2.0f, 2.0f, 2.0f); 

@@ -32,5 +32,11 @@ A projekt egy belső nézetű (FPS) játék ahol egy procedurálisan generált l
 ## FUTTATÁS:
 
 Az alábbi linken elérhetőek az assettek: https://drive.google.com/drive/folders/1x6fQ6rOnanDUzLcu8bjjYmnIJxhpQRIa?usp=sharing
-ez az egész mappát be kell tölteni a p.exe mellé egy "assets" nevű mappába
+ez az egész mappát be kell tölteni a mino.exe mellé egy "assets" nevű mappábaú
+
+make parancs után mino.exe-vel futtatható a program
+
+
+
+
 

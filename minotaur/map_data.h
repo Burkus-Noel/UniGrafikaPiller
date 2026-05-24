@@ -3,10 +3,8 @@
 
 #include "world.h"
 
-// Külső szoba adatok a pályageneráláshoz
-extern Room room_start;
-extern Room room_boss;
-extern Room room_pool[];
-extern int room_pool_size;
+Room getStartRoom(void);
+Room getBossRoom(void);
+Room getRandomPoolRoom(void);
 
 #endif

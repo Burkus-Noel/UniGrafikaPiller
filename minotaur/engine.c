@@ -4,6 +4,7 @@
 #include "sound.h"
 #include "draw.h"
 #include "UI.h"
+#include "world.h"
 #include <stdio.h>
 #include <time.h>
 
@@ -13,12 +14,11 @@ struct Engine {
     bool running;
     int width;
     int height;
+    Player player;
     GameState state;
     Assets assets;
+    MapData mapData;
 };
-
-GameState game;
-Assets assets;
 
 Engine* Engine_Create(const char* title, int width, int height) {
     srand((unsigned int)time(NULL));
@@ -41,9 +41,16 @@ Engine* Engine_Create(const char* title, int width, int height) {
     self->glContext = SDL_GL_CreateContext(self->window);
     self->running = true;
 
-    self->state = (GameState){true, false, false, 0, 5.0f, 5.0f, 0.2f, false, false, false};
+    self->state = (GameState){true, false, false, 0, 5.0f, 5.0f, 0.08f, false, false, false};
 
-    // Alaprendszerek indítása
+    self->player = (Player){
+        .posX = 2.0f,
+        .posZ = 2.0f,
+        .yaw = 0.0f,
+        .pitch = 0.0f,
+        .eyeHeight = -1.0f
+    };
+
     initAudio();
     initLighting();
     initText();
@@ -71,9 +78,15 @@ void Engine_LoadAssets(Engine* self) {
     self->assets.minoModel.texture = loadTexture("assets/minotaur.png");
 
     SDL_SetRelativeMouseMode(SDL_TRUE);
-    initFirstRoom();
-    initParticlesEverywhere();
+    initFirstRoom(&self->player, &self->mapData);
+    initParticlesEverywhere(&self->mapData);
 }
+
+bool Engine_IsRunning(Engine* self) {
+    if (self == NULL) return false;
+    return self->running;
+}
+
 
 void Engine_HandleEvents(Engine* self) {
     SDL_Event event;
@@ -86,16 +99,17 @@ void Engine_HandleEvents(Engine* self) {
                 self->state.showMenu = !self->state.showMenu;
                 SDL_SetRelativeMouseMode(self->state.showMenu ? SDL_FALSE : SDL_TRUE);
             }
-            if (event.key.keysym.sym == SDLK_v) self->state.helmetOn = !self->state.helmetOn;
+            if (event.key.keysym.sym == SDLK_v) {
+            self->state.helmetOn = !self->state.helmetOn;
+            playHelmetSound();
+          }
         }
 
         if (event.type == SDL_MOUSEMOTION && !self->state.showMenu && !self->state.gameOver) {
-            // Itt a globális yaw/pitch-et használjuk (vagy átrakhatod a GameState-be)
-            extern float yaw, pitch; 
-            yaw   += event.motion.xrel * 0.1f;
-            pitch += event.motion.yrel * 0.1f;
-            if (pitch > 89.0f)  pitch = 89.0f;
-            if (pitch < -89.0f) pitch = -89.0f;
+            self->player.yaw   += event.motion.xrel * 0.1f;
+            self->player.pitch += event.motion.yrel * 0.1f;
+            if (self->player.pitch > 89.0f)  self->player.pitch = 89.0f;
+            if (self->player.pitch < -89.0f) self->player.pitch = -89.0f;
         }
     }
 }
@@ -103,13 +117,12 @@ void Engine_HandleEvents(Engine* self) {
 void Engine_Update(Engine* self) {
     if (self->state.gameOver || self->state.gameWon) return;
 
-    handlePlayerMovement(SDL_GetKeyboardState(NULL));
-    checkSwordPickup(&self->state);
+    handlePlayerMovement(&self->player, &self->state, &self->mapData, SDL_GetKeyboardState(NULL));
+    checkSwordPickup(&self->player, &self->state, &self->mapData);
 
-    // Minotaurusz AI
     if (self->state.minoSpawned && !self->state.showMenu) {
-        float dirX = posX - self->state.minoX;
-        float dirZ = posZ - self->state.minoZ;
+        float dirX = self->player.posX - self->state.minoX;
+        float dirZ = self->player.posZ - self->state.minoZ;
         float distance = sqrtf(dirX * dirX + dirZ * dirZ);
 
         if (distance > 0.1f) {
@@ -133,28 +146,20 @@ void Engine_Render(Engine* self) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
-    // Kamera transzformáció
-    extern float posX, posZ, yaw, pitch, eyeHeight;
-    glRotatef(pitch, 1.0f, 0.0f, 0.0f);
-    glRotatef(yaw, 0.0f, 1.0f, 0.0f);
-    glTranslatef(-posX, eyeHeight, -posZ); 
+    glRotatef(self->player.pitch, 1.0f, 0.0f, 0.0f);
+    glRotatef(self->player.yaw, 0.0f, 1.0f, 0.0f);
+    glTranslatef(-self->player.posX, self->player.eyeHeight, -self->player.posZ); 
 
     setupFog(); 
     updateAndDrawParticles();
-    drawMap(&self->state, &self->assets);
+    drawMap(&self->state, &self->assets, &self->player, &self->mapData);
 
     if (self->state.minoSpawned) {
-        drawMinotaur(self->state.minoX, self->state.minoZ, &self->assets.minoModel);
+        drawMinotaur(self->state.minoX, self->state.minoZ, &self->assets.minoModel, &self->player);
     }
 
-    // UI réteg
     drawUI(&self->state, &self->assets);
-
     SDL_GL_SwapWindow(self->window);
-}
-
-bool Engine_IsRunning(Engine* self) {
-    return self->running;
 }
 
 void Engine_Destroy(Engine* self) {

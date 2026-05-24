@@ -1,9 +1,8 @@
 #include <SDL2/SDL.h>
 #include <stdio.h>
-#include "engine.h" // Ez az új "osztályunk" fejléce
+#include "engine.h" 
 
 int main(int argc, char* argv[]) {
-    // 1. Objektum létrehozása (Konstruktor hívás)
     Engine* engine = Engine_Create("Minotaurusz Utvesztoje", 800, 600);
     if (!engine) {
         fprintf(stderr, "Hiba az Engine inicializálásakor!\n");

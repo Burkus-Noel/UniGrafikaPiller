@@ -8,8 +8,6 @@
 #include <stdlib.h>
     
 float brightness = 1.0f;
-extern Room* currentRoomPtr;
-extern SimpleModel minoModel;
 
 // --- PARTIKLUK ---
 #define MAX_PARTICLES 300
@@ -61,12 +59,12 @@ void initLighting() {
 
 // --- FŐ RAJZOLÓK ---
 
-void drawMap(GameState* state, Assets* assets) {
+void drawMap(GameState* state, Assets* assets, Player* player, MapData* mapData){
     glEnable(GL_LIGHTING);
     update_lighting();
 
-    for (int j = 0; j < currentHeight; j++) {
-        for (int i = 0; i < currentWidth; i++) {
+    for (int j = 0; j < mapData->currentHeight; j++) {
+        for (int i = 0; i < mapData->currentWidth; i++) {
             float wx = i * 2.0f;
             float wz = j * 2.0f;
 
@@ -79,16 +77,16 @@ void drawMap(GameState* state, Assets* assets) {
                 glTexCoord2f(0, 1); glVertex3f(wx - 1, -1.01f, wz + 1);
             glEnd();
 
-            int cell = map[j][i];
+            int cell = mapData->map[j][i];
             if (cell == 1) {
                 glBindTexture(GL_TEXTURE_2D, assets->stone);
                 drawWall(wx, wz, 60.0f);
             } else if (cell == 2) {
-                drawFire(wx, wz, assets->fire, assets->torch);
+                drawFire(wx, wz, assets->fire, assets->torch,player);
             } else if (cell == 3 || cell == 4) {
                 glPushMatrix();
                 glTranslatef(wx, 0, wz);
-                if (i == 0 || i == currentWidth - 1) glRotatef(90, 0, 1, 0);
+                if (i == 0 || i == mapData->currentWidth - 1) glRotatef(90, 0, 1, 0);
                 drawDoor(0, 0, 3.5f, assets->ajto);
                 glTranslatef(0, 3.5f, 0); 
                 glBindTexture(GL_TEXTURE_2D, assets->stone);
@@ -126,12 +124,12 @@ void drawMap(GameState* state, Assets* assets) {
 
 // --- PARTICLE ---
 
-void initParticlesEverywhere() {
-    if (!currentRoomPtr) return; 
+void initParticlesEverywhere(MapData* mapData) {
+    if (!mapData->currentRoomPtr) return; 
     int count = 0; float coords[200][2];
-    for (int j = 0; j < currentRoomPtr->height; j++) {
-        for (int i = 0; i < currentRoomPtr->width; i++) {
-            if (currentRoomPtr->data[j][i] == 2 && count < 200) {
+    for (int j = 0; j < mapData->currentRoomPtr->height; j++) {
+        for (int i = 0; i < mapData->currentRoomPtr->width; i++) {
+            if (mapData->currentRoomPtr->data[j][i] == 2 && count < 200) {
                 coords[count][0] = i * 2.0f; coords[count][1] = j * 2.0f;
                 count++;
             }

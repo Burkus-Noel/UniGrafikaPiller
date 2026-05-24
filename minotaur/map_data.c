@@ -353,8 +353,6 @@ Room room_pool[] = {
 
 };
 
-int room_pool_size = sizeof(room_pool) / sizeof(room_pool[0]);
-
 Room room_boss = {
     9, 15,
     {
@@ -376,4 +374,20 @@ Room room_boss = {
     },
     4, 0
 };
+
+
+int room_pool_size = sizeof(room_pool) / sizeof(room_pool[0]);
+
+Room getStartRoom(void) {
+    return room_start;
+}
+
+Room getBossRoom(void) {
+    return room_boss;
+}
+
+Room getRandomPoolRoom(void) {
+    int r = rand() % room_pool_size;
+    return room_pool[r];
+}
 
